@@ -85,19 +85,7 @@
 Высота: ${c.altitude ? c.altitude.toFixed(0)+' м' : 'нет'}
 Скорость: ${c.speed ? c.speed.toFixed(1)+' м/с' : 'стоишь'}
 
-Твои координаты у нас! 🔥`;
-
-          // Фейковые "куки" и "посещения" (реальные куки этого сайта — пустые)
-          text += `\n\nНайденные куки (сессии, логин...):
-${document.cookie || 'нет куки на этом сайте (или они скрыты HttpOnly)'}
-
-Фейковые последние посещения (браузер не даёт, но представим...):
-- youtube.com/watch?v=твой_обзор
-- tiktok.com/@eduard_reviews
-- instagram.com/eduard_uz
-
-Теперь все знают где ты и что смотришь 😈 Перешли другу!`;
-
+Теперь я знаю где ты реально находишься! 🔥 Перешли другу — пусть тоже "посмотрит"!`;
           info.textContent = text;
         },
         err => {
@@ -106,29 +94,38 @@ ${document.cookie || 'нет куки на этом сайте (или они с
           else if (err.code === 2) msg += " GPS недоступен.";
           else msg += " " + err.message;
 
-          msg += "\n\nFallback по IP:";
-          fetch('http://ip-api.com/json/').then(r=>r.json()).then(g=>{
-            if (g.status==='success') {
-              msg += `\nГород: ${g.city}, ${g.regionName}, ${g.country}
+          msg += "\n\nПримерное место по IP:";
+          fetch('http://ip-api.com/json/')
+            .then(r => r.json())
+            .then(g => {
+              if (g.status === 'success') {
+                msg += `\nГород: ${g.city}, ${g.regionName}, ${g.country}
 Координаты ~${g.lat}, ${g.lon}`;
-            }
-            info.textContent = getBaseInfo() + msg + "\n\nВсё равно попался 😂";
-          }).catch(()=> info.textContent = getBaseInfo() + msg);
+              }
+              info.textContent = getBaseInfo() + msg + "\n\nВсё равно попался 😂 Перешли другу!";
+            })
+            .catch(() => {
+              info.textContent = getBaseInfo() + msg + "\n\nIP-гео тоже не загрузилось... но данные собраны!";
+            });
         },
-        { enableHighAccuracy: true, timeout: 10000 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
-      info.textContent = getBaseInfo() + "\n\nГеолокация не поддерживается... но данные уже собраны!";
+      info.textContent = getBaseInfo() + "\n\nГеолокация не поддерживается твоим браузером...";
     }
   }
 
   function getBaseInfo() {
     let ua = navigator.userAgent;
-    let device = /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android (Samsung/Xiaomi?)' : 'ПК';
-    return `Время взлома: ${new Date().toLocaleString('ru-RU')}
+    let device = 'Неизвестное устройство';
+    if (/iPhone/.test(ua)) device = 'iPhone';
+    else if (/Android/.test(ua)) device = 'Android устройство';
+    else if (/Windows/.test(ua)) device = 'ПК / ноутбук';
+
+    return `Время захвата: ${new Date().toLocaleString('ru-RU')}
 Устройство: ${device}
 User-Agent: ${ua}
-Экран: ${screen.width}×${screen.height}
+Экран: ${screen.width} × ${screen.height}
 RAM ≈ ${navigator.deviceMemory || '?'} ГБ
 Ядер CPU: ${navigator.hardwareConcurrency || '?'}`;
   }
