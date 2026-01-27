@@ -2,44 +2,162 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Мои личные видео и обзоры — Eduard</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f8f9fa; color: #333; margin: 0; padding: 0; }
-    .container { max-width: 900px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
-    h1 { color: #2c3e50; }
-    .btn { background: #27ae60; color: white; border: none; padding: 18px 50px; font-size: 1.4em; border-radius: 8px; cursor: pointer; margin: 30px 0; transition: 0.3s; }
-    .btn:hover { background: #219653; transform: scale(1.05); }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 95%;
+      width: 100%;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      font-size: clamp(1.8rem, 6vw, 2.5rem);
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+    p {
+      font-size: clamp(1rem, 4.5vw, 1.3rem);
+      margin: 15px 0;
+    }
+    .btn {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 16px 40px;
+      font-size: clamp(1.1rem, 5vw, 1.4em);
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 20px 0;
+      transition: all 0.2s;
+      width: 90%;
+      max-width: 400px;
+    }
+    .btn:hover {
+      background: #219653;
+      transform: scale(1.03);
+    }
     .hidden { display: none; }
-    .hacked { background: #000; color: #0f0; font-family: 'Courier New', monospace; min-height: 100vh; padding: 40px; text-align: center; }
-    .hacked h1 { color: #f00; text-shadow: 0 0 15px #f00; animation: blink 1.2s infinite alternate; }
-    pre { background: #111; padding: 25px; border: 2px solid #0f0; border-radius: 10px; white-space: pre-wrap; font-size: 1.1em; max-width: 900px; margin: 30px auto; text-align: left; height: 220px; overflow-y: auto; }
-    .choice { margin: 40px 0; }
-    .yes { background: #e74c3c; }
-    .no { background: #7f8c8d; }
-    .stop-container { margin: 40px 0; font-size: 1.6em; color: #ffcc00; }
-    .stop-btn { padding: 20px 60px; font-size: 1.5em; margin: 0 30px; }
-    .progress { width: 80%; max-width: 700px; height: 30px; background: #222; border: 2px solid #0f0; border-radius: 6px; margin: 20px auto; overflow: hidden; }
-    .progress-bar { height: 100%; width: 0%; background: linear-gradient(to right, #0f0, #00cc00); transition: width 0.4s linear; }
-    @keyframes blink { from { opacity: 1; } to { opacity: 0.6; } }
+
+    /* Взломанный режим */
+    .hacked {
+      background: #000;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      padding: 15px;
+      text-align: center;
+    }
+    .hacked h1 {
+      color: #f00;
+      text-shadow: 0 0 15px #f00;
+      animation: blink 1.5s infinite alternate;
+      font-size: clamp(1.8rem, 8vw, 3rem);
+      margin: 20px 0;
+    }
+    .progress {
+      width: 90%;
+      max-width: 700px;
+      height: 28px;
+      background: #222;
+      border: 2px solid #0f0;
+      border-radius: 6px;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #0f0, #00cc00);
+      transition: width 0.4s linear;
+    }
+    pre#log {
+      background: #111;
+      padding: 15px;
+      border: 2px solid #0f0;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-size: clamp(0.95rem, 4vw, 1.1em);
+      max-height: 40vh;
+      overflow-y: auto;
+      margin: 15px auto;
+      width: 95%;
+      max-width: 900px;
+      text-align: left;
+    }
+    .stop-container {
+      margin: 30px 0;
+      font-size: clamp(1.2rem, 5vw, 1.6em);
+      color: #ffcc00;
+    }
+    .stop-btn {
+      padding: 16px 40px;
+      font-size: clamp(1.1rem, 5vw, 1.4em);
+      margin: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      min-width: 140px;
+    }
+    .stop-btn.yes { background: #e74c3c; color: white; }
+    .stop-btn.no  { background: #7f8c8d; color: white; }
+
+    .choice {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    @keyframes blink {
+      from { opacity: 1; }
+      to   { opacity: 0.6; }
+    }
+
+    /* Мобильная адаптация */
+    @media (min-width: 600px) {
+      .choice {
+        flex-direction: row;
+        justify-content: center;
+      }
+      .btn, .stop-btn {
+        width: auto;
+      }
+      .container {
+        padding: 40px;
+        margin: 40px auto;
+      }
+    }
   </style>
 </head>
 <body>
 
-<!-- Белая страница -->
+<!-- Добрая страница -->
 <div id="goodPage" class="container">
   <h1>Привет! Это мой личный уголок</h1>
-  <p style="font-size: 1.3em; line-height: 1.6;">
-    Здесь я храню свои видео-обзоры, записи стримов и личные мысли.<br>
-    <strong>Не для чужих глаз!</strong> Если ты не я — лучше не смотри 😅
-  </p>
+  <p>Здесь я храню свои видео-обзоры, записи стримов и личные мысли.<br><strong>Не для чужих глаз!</strong> Если ты не я — лучше не смотри 😅</p>
   <button class="btn" onclick="showChoice()">ОТКРЫТЬ МОИ ВИДЕО И ОБЗОРЫ</button>
 </div>
 
-<!-- Фейковый выбор -->
+<!-- Выбор -->
 <div id="choicePage" class="container hidden">
   <h2>Ты точно хочешь это увидеть?</h2>
-  <p style="font-size: 1.4em; color: #c0392b; font-weight: bold;">
+  <p style="color: #c0392b; font-weight: bold; font-size: clamp(1.1rem, 5vw, 1.4em);">
     Это мои личные записи, видео, обзоры... Никому не показывал!
   </p>
   <div class="choice">
@@ -48,7 +166,7 @@
   </div>
 </div>
 
-<!-- Страшная страница -->
+<!-- Взлом -->
 <div id="hackedPage" class="hacked hidden">
   <h1>СИСТЕМА ВЗЛОМАНА! ТЫ ПОПАЛСЯ 😈</h1>
   
@@ -60,8 +178,10 @@
   
   <div class="stop-container hidden" id="stopAsk">
     <div>Остановить загрузку файлов?</div>
-    <button class="stop-btn yes" onclick="tryStop(true)">ДА, ОСТАНОВИТЬ!</button>
-    <button class="stop-btn no" onclick="tryStop(false)">НЕТ, ПРОДОЛЖАЙ</button>
+    <div>
+      <button class="stop-btn yes" onclick="tryStop(true)">ДА, ОСТАНОВИТЬ!</button>
+      <button class="stop-btn no" onclick="tryStop(false)">НЕТ, ПРОДОЛЖАЙ</button>
+    </div>
   </div>
 </div>
 
@@ -83,9 +203,9 @@
 
   function userRefused() {
     document.body.innerHTML = `
-      <div style="background:#111; color:#ffcc00; padding:100px; text-align:center; font-size:2em;">
+      <div style="background:#111; color:#ffcc00; padding:15vh 5vw; text-align:center; font-size:clamp(1.5rem,8vw,3rem);">
         <h1>ОШИБКА 404 — СТРАНИЦА НЕ НАЙДЕНА</h1>
-        <p>Похоже, доступ запрещён... или ты струсил? 😏</p>
+        <p style="margin-top:30px;">Похоже, доступ запрещён... или ты струсил? 😏</p>
       </div>
     `;
   }
@@ -96,11 +216,11 @@
     log.textContent = "Запуск процесса...\n";
 
     interval = setInterval(() => {
-      percent += Math.random() * 6 + 1.5;
+      percent += Math.random() * 5 + 1.8;
       if (percent > 100) percent = 100;
       progBar.style.width = percent + '%';
 
-      if (percent > 25 && stopAsk.classList.contains('hidden')) {
+      if (percent > 28 && stopAsk.classList.contains('hidden')) {
         stopAsk.classList.remove('hidden');
         log.innerHTML += "Файлы обнаружены. Запрос на остановку...\n";
       }
@@ -109,14 +229,14 @@
         clearInterval(interval);
         finishHack();
       }
-    }, 400);
+    }, 350);
 
     const logs = [
       "Сканирование устройства...",
-      "Обход блокировки экрана...",
-      "Извлечение данных о местоположении...",
-      "Скачивание фото и видео...",
-      "Передача координат на сервер...",
+      "Обход блокировки...",
+      "Получение координат...",
+      "Скачивание медиафайлов...",
+      "Передача данных на сервер...",
       "Установка скрытого доступа..."
     ];
 
@@ -127,35 +247,32 @@
         log.scrollTop = log.scrollHeight;
         i++;
       } else clearInterval(logTimer);
-    }, 2200);
+    }, 1800 + Math.random() * 700);
   }
 
   function tryStop(wantStop) {
     stopAsk.classList.add('hidden');
 
     if (wantStop) {
-      log.innerHTML += "\nПОПЫТКА ОСТАНОВКИ... ОТКЛОНЕНО!\nУже поздно... файлы отправлены на сервер.\n";
-      setTimeout(finishHack, 1800);
+      log.innerHTML += "\nПОПЫТКА ОСТАНОВКИ... ОТКЛОНЕНО!\nУже поздно... файлы отправлены.\n";
+      setTimeout(finishHack, 1400);
     } else {
       log.innerHTML += "\nЗагрузка продолжена...\n";
-      percent += 20; // ускоряем
+      percent += 18;
     }
   }
 
   function finishHack() {
-    log.innerHTML += "\nЗАГРУЗКА ЗАВЕРШЕНА 100%\nДанные успешно украдены!\n";
+    log.innerHTML += "\nЗАГРУЗКА 100% ЗАВЕРШЕНА\nДанные украдены!\n";
 
     setTimeout(() => {
-      log.innerHTML += "\n\nКритическая ошибка... система завершает работу...\n";
+      log.innerHTML += "\nКритическая ошибка... завершение работы...\n";
       setTimeout(() => {
-        try {
-          window.close(); // пытаемся закрыть вкладку
-        } catch (e) {
-          // если не закрылось — перезагружаем страницу
-          location.href = "about:blank";
-        }
-      }, 2200);
-    }, 1500);
+        try { window.close(); } catch(e) {}
+        // fallback
+        setTimeout(() => { location.href = "about:blank"; }, 2000);
+      }, 1800);
+    }, 1200);
   }
 </script>
 </body>
