@@ -5,55 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Мои личные видео и обзоры — Eduard</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #f8f9fa;
-      color: #333;
+      color: #111;
       min-height: 100vh;
       line-height: 1.5;
+      transition: all 0.4s;
     }
     .container {
       max-width: 95%;
-      width: 100%;
       margin: 20px auto;
       padding: 20px;
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
       text-align: center;
     }
-    h1 {
-      font-size: clamp(1.8rem, 6vw, 2.5rem);
-      color: #2c3e50;
-      margin-bottom: 15px;
-    }
-    p {
-      font-size: clamp(1rem, 4.5vw, 1.3rem);
-      margin: 15px 0;
-    }
+    h1 { font-size: clamp(1.8rem, 7vw, 2.4rem); margin-bottom: 12px; }
+    p { font-size: clamp(1rem, 4.5vw, 1.25rem); margin: 12px 0; }
     .btn {
-      background: #27ae60;
+      background: #28a745;
       color: white;
       border: none;
-      padding: 16px 40px;
-      font-size: clamp(1.1rem, 5vw, 1.4em);
-      border-radius: 10px;
+      padding: 16px 36px;
+      font-size: clamp(1.1rem, 5vw, 1.3rem);
+      border-radius: 12px;
       cursor: pointer;
       margin: 20px 0;
+      width: 88%;
+      max-width: 380px;
       transition: all 0.2s;
-      width: 90%;
-      max-width: 400px;
     }
-    .btn:hover {
-      background: #219653;
-      transform: scale(1.03);
-    }
-    .hidden { display: none; }
+    .btn:active { transform: scale(0.97); }
+    .hidden { display: none !important; }
 
     /* Взломанный режим */
     .hacked {
@@ -61,126 +47,124 @@
       color: #0f0;
       font-family: 'Courier New', monospace;
       min-height: 100vh;
-      padding: 15px;
+      padding: 12px;
       text-align: center;
+      transition: all 0.6s;
     }
     .hacked h1 {
       color: #f00;
-      text-shadow: 0 0 15px #f00;
-      animation: blink 1.5s infinite alternate;
-      font-size: clamp(1.8rem, 8vw, 3rem);
-      margin: 20px 0;
+      text-shadow: 0 0 12px #f00;
+      animation: glitch 2s infinite;
+      font-size: clamp(1.6rem, 9vw, 2.8rem);
     }
     .progress {
-      width: 90%;
-      max-width: 700px;
-      height: 28px;
-      background: #222;
+      width: 92%;
+      height: 26px;
+      background: #111;
       border: 2px solid #0f0;
       border-radius: 6px;
-      margin: 20px auto;
+      margin: 18px auto;
       overflow: hidden;
     }
     .progress-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(to right, #0f0, #00cc00);
-      transition: width 0.4s linear;
+      background: linear-gradient(90deg, #0f0, #00ff00);
+      transition: width 0.35s linear;
     }
     pre#log {
-      background: #111;
-      padding: 15px;
-      border: 2px solid #0f0;
+      background: #0a0a0a;
+      padding: 14px;
+      border: 1px solid #0f0;
       border-radius: 8px;
-      white-space: pre-wrap;
-      font-size: clamp(0.95rem, 4vw, 1.1em);
-      max-height: 40vh;
+      font-size: clamp(0.9rem, 3.8vw, 1rem);
+      max-height: 38vh;
       overflow-y: auto;
-      margin: 15px auto;
-      width: 95%;
-      max-width: 900px;
+      margin: 12px auto;
+      width: 96%;
       text-align: left;
+      white-space: pre-wrap;
     }
     .stop-container {
       margin: 30px 0;
-      font-size: clamp(1.2rem, 5vw, 1.6em);
+      font-size: clamp(1.3rem, 5.5vw, 1.6rem);
       color: #ffcc00;
     }
     .stop-btn {
-      padding: 16px 40px;
-      font-size: clamp(1.1rem, 5vw, 1.4em);
-      margin: 12px;
+      padding: 14px 32px;
+      font-size: clamp(1rem, 5vw, 1.2rem);
+      margin: 10px 6px;
       border-radius: 10px;
-      cursor: pointer;
-      min-width: 140px;
+      min-width: 130px;
     }
-    .stop-btn.yes { background: #e74c3c; color: white; }
-    .stop-btn.no  { background: #7f8c8d; color: white; }
+    .stop-btn.yes { background: #dc3545; color: white; }
+    .stop-btn.no  { background: #6c757d; color: white; }
 
-    .choice {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
+    .choice { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+
+    /* Глюки после краша */
+    .glitch {
+      animation: glitch 0.8s infinite;
+    }
+    .invert { filter: invert(1) hue-rotate(180deg); }
+    .shake { animation: shake 0.5s infinite; }
+
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 #f00, -2px 0 #0ff; }
+      20% { text-shadow: -2px 0 #0f0, 2px 0 #f0f; }
+      40% { text-shadow: 0 0 #ff0, 0 0 #0ff; }
+      60% { text-shadow: 3px 0 #f00, -3px 0 #0ff; }
+      80% { text-shadow: -1px 0 #0f0, 1px 0 #f0f; }
+      100% { text-shadow: 2px 0 #f00, -2px 0 #0ff; }
     }
 
-    @keyframes blink {
-      from { opacity: 1; }
-      to   { opacity: 0.6; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-3px); }
     }
 
-    /* Мобильная адаптация */
-    @media (min-width: 600px) {
-      .choice {
-        flex-direction: row;
-        justify-content: center;
-      }
-      .btn, .stop-btn {
-        width: auto;
-      }
-      .container {
-        padding: 40px;
-        margin: 40px auto;
-      }
+    @media (min-width: 500px) {
+      .choice { flex-direction: row; justify-content: center; }
+      .btn, .stop-btn { width: auto; }
+      .container { padding: 32px; margin: 30px auto; }
     }
   </style>
 </head>
 <body>
 
-<!-- Добрая страница -->
 <div id="goodPage" class="container">
   <h1>Привет! Это мой личный уголок</h1>
-  <p>Здесь я храню свои видео-обзоры, записи стримов и личные мысли.<br><strong>Не для чужих глаз!</strong> Если ты не я — лучше не смотри 😅</p>
-  <button class="btn" onclick="showChoice()">ОТКРЫТЬ МОИ ВИДЕО И ОБЗОРЫ</button>
+  <p>Здесь лежат мои видео-обзоры, стримы и заметки.<br><strong>Личное!</strong> Не смотри, если не я 😅</p>
+  <button class="btn" onclick="showChoice()">ОТКРЫТЬ МОИ ВИДЕО</button>
 </div>
 
-<!-- Выбор -->
 <div id="choicePage" class="container hidden">
-  <h2>Ты точно хочешь это увидеть?</h2>
-  <p style="color: #c0392b; font-weight: bold; font-size: clamp(1.1rem, 5vw, 1.4em);">
-    Это мои личные записи, видео, обзоры... Никому не показывал!
+  <h2>Ты уверен, что хочешь посмотреть?</h2>
+  <p style="color:#c82333; font-weight:bold; font-size:clamp(1.1rem,5vw,1.35rem);">
+    Это приватные записи, обзоры, мысли... Никому не показывал.
   </p>
   <div class="choice">
-    <button class="btn yes" onclick="startFakeDownload()">ДА, ПОКАЖИ ВСЁ</button>
-    <button class="btn no" onclick="userRefused()">НЕТ, ЗАКРОЙ</button>
+    <button class="btn" style="background:#dc3545;" onclick="startFakeDownload()">ДА, ПОКАЗАТЬ</button>
+    <button class="btn" style="background:#6c757d;" onclick="userRefused()">НЕТ, ЗАКРЫТЬ</button>
   </div>
 </div>
 
-<!-- Взлом -->
 <div id="hackedPage" class="hacked hidden">
-  <h1>СИСТЕМА ВЗЛОМАНА! ТЫ ПОПАЛСЯ 😈</h1>
+  <h1 id="hackTitle">СИСТЕМА КОМПРОМЕТИРОВАНА</h1>
   
   <div class="progress">
     <div class="progress-bar" id="progBar"></div>
   </div>
   
-  <pre id="log">Инициализация...</pre>
+  <pre id="log">Запуск эксплойта...\n</pre>
   
   <div class="stop-container hidden" id="stopAsk">
-    <div>Остановить загрузку файлов?</div>
+    <div>Прервать загрузку файлов?</div>
     <div>
-      <button class="stop-btn yes" onclick="tryStop(true)">ДА, ОСТАНОВИТЬ!</button>
-      <button class="stop-btn no" onclick="tryStop(false)">НЕТ, ПРОДОЛЖАЙ</button>
+      <button class="stop-btn yes" onclick="tryStop(true)">ДА, ПРЕРВАТЬ</button>
+      <button class="stop-btn no" onclick="tryStop(false)">НЕТ, ЗАВЕРШИТЬ</button>
     </div>
   </div>
 </div>
@@ -192,6 +176,7 @@
   const log = document.getElementById('log');
   const progBar = document.getElementById('progBar');
   const stopAsk = document.getElementById('stopAsk');
+  const hackTitle = document.getElementById('hackTitle');
 
   let percent = 0;
   let interval;
@@ -203,9 +188,9 @@
 
   function userRefused() {
     document.body.innerHTML = `
-      <div style="background:#111; color:#ffcc00; padding:15vh 5vw; text-align:center; font-size:clamp(1.5rem,8vw,3rem);">
-        <h1>ОШИБКА 404 — СТРАНИЦА НЕ НАЙДЕНА</h1>
-        <p style="margin-top:30px;">Похоже, доступ запрещён... или ты струсил? 😏</p>
+      <div style="background:#000; color:#ffcc00; padding:20vh 5vw; text-align:center; font-size:clamp(1.6rem,9vw,3rem);">
+        <h1>ДОСТУП ОТКЛОНЁН</h1>
+        <p style="margin-top:40px;">Страница не найдена... или ты испугался? 😏</p>
       </div>
     `;
   }
@@ -213,31 +198,32 @@
   function startFakeDownload() {
     choice.classList.add('hidden');
     hacked.classList.remove('hidden');
-    log.textContent = "Запуск процесса...\n";
+    log.textContent = "Инициализация эксплойта...\n";
 
     interval = setInterval(() => {
-      percent += Math.random() * 5 + 1.8;
+      percent += Math.random() * 4.5 + 1.2;
       if (percent > 100) percent = 100;
       progBar.style.width = percent + '%';
 
-      if (percent > 28 && stopAsk.classList.contains('hidden')) {
+      if (percent > 30 && stopAsk.classList.contains('hidden')) {
         stopAsk.classList.remove('hidden');
-        log.innerHTML += "Файлы обнаружены. Запрос на остановку...\n";
+        log.innerHTML += "Обнаружены файлы. Запрос на прерывание...\n";
       }
 
       if (percent >= 100) {
         clearInterval(interval);
         finishHack();
       }
-    }, 350);
+    }, 380);
 
     const logs = [
-      "Сканирование устройства...",
-      "Обход блокировки...",
-      "Получение координат...",
-      "Скачивание медиафайлов...",
-      "Передача данных на сервер...",
-      "Установка скрытого доступа..."
+      "Сканирование памяти устройства...",
+      "Обход системной защиты...",
+      "Получение координат GPS...",
+      "Активация Bluetooth...",
+      "Доступ к камере и микрофону...",
+      "Передача медиафайлов...",
+      "Установка бэкдора..."
     ];
 
     let i = 0;
@@ -247,32 +233,58 @@
         log.scrollTop = log.scrollHeight;
         i++;
       } else clearInterval(logTimer);
-    }, 1800 + Math.random() * 700);
+    }, 1600 + Math.random() * 600);
   }
 
   function tryStop(wantStop) {
     stopAsk.classList.add('hidden');
 
     if (wantStop) {
-      log.innerHTML += "\nПОПЫТКА ОСТАНОВКИ... ОТКЛОНЕНО!\nУже поздно... файлы отправлены.\n";
-      setTimeout(finishHack, 1400);
+      log.innerHTML += "\nПопытка прерывания... ОТКЛОНЕНО СИСТЕМОЙ!\nУже поздно — передача завершена.\n";
+      setTimeout(systemGlitch, 1200);
     } else {
-      log.innerHTML += "\nЗагрузка продолжена...\n";
-      percent += 18;
+      log.innerHTML += "\nПроцесс продолжается...\n";
+      percent += 22;
     }
   }
 
-  function finishHack() {
-    log.innerHTML += "\nЗАГРУЗКА 100% ЗАВЕРШЕНА\nДанные украдены!\n";
+  function systemGlitch() {
+    log.innerHTML += "\nКРИТИЧЕСКАЯ ОШИБКА УСТРОЙСТВА\nСистема нестабильна...\n";
+
+    // Имитация багов
+    document.body.classList.add('invert');
+    hackTitle.classList.add('glitch');
+    log.classList.add('shake');
+
+    // Фейковые системные сообщения
+    setTimeout(() => {
+      log.innerHTML += "\nBluetooth: ВКЛЮЧЁН\n";
+      if ('vibrate' in navigator) navigator.vibrate([80, 40, 80]);
+    }, 800);
 
     setTimeout(() => {
-      log.innerHTML += "\nКритическая ошибка... завершение работы...\n";
+      log.innerHTML += "Геолокация: АКТИВИРОВАНА (высокая точность)\n";
+      if ('vibrate' in navigator) navigator.vibrate(120);
+    }, 1600);
+
+    setTimeout(() => {
+      log.innerHTML += "Камера: ДОСТУП ПОЛУЧЕН\nМикрофон: ДОСТУП ПОЛУЧЕН\n";
+      document.body.classList.add('glitch');
+    }, 2400);
+
+    setTimeout(() => {
+      log.innerHTML += "\nПЕРЕЗАГРУЗКА УСТРОЙСТВА ЧЕРЕЗ 3...\n2...\n1...\n";
+      document.body.style.transition = 'all 1.2s';
+      document.body.style.filter = 'brightness(0)';
       setTimeout(() => {
-        try { window.close(); } catch(e) {}
-        // fallback
-        setTimeout(() => { location.href = "about:blank"; }, 2000);
-      }, 1800);
-    }, 1200);
+        location.href = "about:blank";
+      }, 2200);
+    }, 3400);
+  }
+
+  function finishHack() {
+    log.innerHTML += "\nПЕРЕДАЧА ЗАВЕРШЕНА 100%\nДанные получены.\n";
+    setTimeout(systemGlitch, 1400);
   }
 </script>
 </body>
