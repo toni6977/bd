@@ -3,160 +3,161 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ТВОЁ МЕСТОПОЛОЖЕНИЕ ОБНАРУЖЕНО 😱</title>
+  <title>СРОЧНО ОТКРОЙ — ЭТО ПРО ТЕБЯ</title>
   <style>
     body {
       font-family: 'Courier New', monospace;
-      background: linear-gradient(to bottom, #000, #110000);
+      background: #000;
       color: #ff0044;
       margin: 0;
-      padding: 30px 20px;
-      min-height: 100vh;
+      padding: 40px 20px;
       text-align: center;
+      min-height: 100vh;
     }
     h1 {
       text-shadow: 0 0 20px #ff0044;
-      animation: blink 1.5s infinite alternate;
+      animation: blink 1.2s infinite alternate;
+      margin-bottom: 10px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
     }
     pre {
-      background: #111;
+      background: #0a0a0a;
       padding: 25px;
       border: 2px solid #ff0044;
       border-radius: 10px;
       white-space: pre-wrap;
       font-size: 1.1em;
-      max-width: 800px;
-      margin: 20px auto;
-      color: #0f0;
       text-align: left;
+      margin: 25px auto;
+      color: #00ff41;
+    }
+    .buttons {
+      margin: 30px 0;
     }
     button {
       background: #ff0044;
       color: white;
       border: none;
-      padding: 15px 40px;
-      font-size: 1.3em;
-      margin: 20px;
+      padding: 18px 50px;
+      font-size: 1.4em;
+      margin: 0 20px;
       cursor: pointer;
       border-radius: 8px;
-      box-shadow: 0 0 15px #ff0044;
+      box-shadow: 0 0 20px rgba(255,0,68,0.6);
+      transition: all 0.2s;
     }
-    .status {
-      color: #ffff00;
-      font-size: 1.2em;
-      margin: 15px;
+    button:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 30px rgba(255,0,68,0.9);
+    }
+    .error-page {
+      background: #111;
+      padding: 60px 20px;
+      border: 3px solid #ff0000;
+      border-radius: 12px;
+      font-size: 1.3em;
+      color: #ffcc00;
     }
     @keyframes blink {
       from { opacity: 1; }
-      to   { opacity: 0.5; }
+      to   { opacity: 0.6; }
     }
   </style>
 </head>
 <body>
-  <h1>СИСТЕМА АКТИВИРОВАНА</h1>
-  <p class="status">Нажми кнопку ниже, чтобы "проверить" своё местоположение... или просто закрой, если боишься 😂</p>
-  
-  <button onclick="getPreciseLocation()">ПОЛУЧИТЬ ТОЧНОЕ МЕСТОПОЛОЖЕНИЕ</button>
-  
-  <pre id="info">Жду твоего клика... (если не нажмёшь — ничего страшного не случится 😏)</pre>
+  <div class="container">
+    <h1>ВНИМАНИЕ! СИСТЕМА ОБНАРУЖИЛА ТЕБЯ</h1>
+    <p style="font-size:1.3em; margin:20px 0;">Ты точно хочешь увидеть, что о тебе уже известно?</p>
+
+    <div class="buttons" id="choice">
+      <button onclick="userSaidYes()">ДА, ПОКАЖИ</button>
+      <button onclick="userSaidNo()">НЕТ, ЗАКРОЙ</button>
+    </div>
+
+    <pre id="info">Жду твоего решения... не тяни 😈</pre>
+  </div>
 
   <script>
     const info = document.getElementById('info');
+    const choiceDiv = document.getElementById('choice');
     const ua = navigator.userAgent;
-    let baseInfo = `Устройство: ${parseDevice()}
 
+    let device = 'Неизвестное устройство';
+    if (/iPhone/.test(ua)) device = 'iPhone';
+    else if (/Android/.test(ua)) device = 'Android (возможно Samsung/Xiaomi/POCO)';
+    else if (/Windows/.test(ua)) device = 'ПК / ноутбук';
+
+    const baseText = `Устройство: ${device}
 User-Agent: ${ua}
 Экран: ${screen.width} × ${screen.height}
 RAM ≈ ${navigator.deviceMemory || '?'} ГБ
-Ядер CPU: ${navigator.hardwareConcurrency || '?'}
-Язык: ${navigator.language}
-Мобильный: ${/Mobi|Android|iPhone|iPad/.test(ua) ? 'Да 📱' : 'Нет'}`;
+Ядер: ${navigator.hardwareConcurrency || '?'}`;
 
-    function parseDevice() {
-      if (/iPhone/.test(ua)) return 'iPhone (iOS)';
-      if (/Android/.test(ua)) {
-        if (/SM-/.test(ua)) return 'Samsung Galaxy';
-        if (/Pixel/.test(ua)) return 'Google Pixel';
-        return 'Android устройство';
-      }
-      return 'ПК или неизвестно';
-    }
+    function userSaidYes() {
+      choiceDiv.style.display = 'none';
+      info.textContent = baseText + '\n\nЗапрашиваю точные координаты...';
 
-    function showBaseInfo(extra = '') {
-      info.textContent = baseInfo + extra;
-    }
-
-    showBaseInfo('\n\nГео по IP загружается...');
-
-    // Сначала покажем IP-гео (fallback)
-    fetch('http://ip-api.com/json/?fields=status,country,regionName,city,lat,lon,zip,isp,mobile,proxy')
-      .then(r => r.json())
-      .then(geo => {
-        if (geo.status === 'success') {
-          let ipGeo = `\n\nГео по IP (примерно):
-Город: ${geo.city}
-Регион: ${geo.regionName}
-Страна: ${geo.country}
-Координаты: ${geo.lat}, ${geo.lon}
-Провайдер: ${geo.isp}
-Мобильный: ${geo.mobile ? 'Да' : 'Нет'}
-VPN?: ${geo.proxy ? 'Да' : 'Нет'}`;
-          showBaseInfo(ipGeo);
-        }
-      })
-      .catch(() => showBaseInfo('\n\nIP-гео не загрузилось'));
-
-    // Функция для точного GPS
-    function getPreciseLocation() {
       if (!navigator.geolocation) {
-        info.textContent += '\n\nГеолокация не поддерживается твоим браузером 😢';
+        info.textContent += '\n\nГеолокация не поддерживается твоим браузером. Жаль...';
         return;
       }
 
-      info.textContent += '\n\nЗапрашиваю точное местоположение... Браузер спросит разрешение!';
-
-      const options = {
-        enableHighAccuracy: true,   // максимально точно (GPS)
-        timeout: 15000,             // 15 сек максимум
-        maximumAge: 0               // свежие данные, не кэш
-      };
-
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const coords = position.coords;
-          let gpsText = `\n\nТОЧНАЯ ГЕОЛОКАЦИЯ (GPS, точность ${Math.round(coords.accuracy)} м):
-Широта: ${coords.latitude.toFixed(6)}
-Долгота: ${coords.longitude.toFixed(6)}
-Высота: ${coords.altitude ? coords.altitude.toFixed(0) + ' м' : 'нет данных'}
-Скорость: ${coords.speed ? coords.speed.toFixed(1) + ' м/с' : 'стоишь на месте'}
-Направление: ${coords.heading ? coords.heading.toFixed(0) + '°' : 'нет'}
-Время: ${new Date(position.timestamp).toLocaleString('ru-RU')}
+        (pos) => {
+          const c = pos.coords;
+          const gps = `\n\nТОЧНЫЕ КООРДИНАТЫ (точность ~${Math.round(c.accuracy)} м):
+Широта: ${c.latitude.toFixed(6)}
+Долгота: ${c.longitude.toFixed(6)}
+Высота: ${c.altitude ? c.altitude.toFixed(0) + ' м над уровнем моря' : 'нет данных'}
+Скорость: ${c.speed ? c.speed.toFixed(1) + ' м/с (ты двигаешься)' : 'стоишь на месте'}
 
-Ты попался по полной! 😂 Теперь знаю где ты реально стоишь.
-Перешли другу — пусть тоже попробует!`;
-
-          info.textContent = baseInfo + gpsText;
+Теперь я точно знаю где ты стоишь 😂
+Перешли другу — пусть тоже "посмотрит"!`;
+          info.textContent = baseText + gps;
         },
-        (error) => {
+        (err) => {
           let msg = '\n\nОшибка: ';
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              msg += 'Ты запретил доступ к геолокации. Жаль, было бы точнее...';
-              break;
-            case error.POSITION_UNAVAILABLE:
-              msg += 'Местоположение недоступно (GPS выключен?)';
-              break;
-            case error.TIMEOUT:
-              msg += 'Слишком долго ждём, таймаут...';
-              break;
-            default:
-              msg += error.message;
-          }
-          info.textContent += msg;
+          if (err.code === 1) msg += 'Ты запретил доступ к геолокации в браузере.';
+          else if (err.code === 2) msg += 'Местоположение недоступно (GPS выключен?)';
+          else if (err.code === 3) msg += 'Слишком долго ждали ответа...';
+          else msg += err.message;
+
+          msg += '\n\nНо не переживай — примерное место мы всё равно знаем по IP.';
+          info.textContent = baseText + msg;
+          loadIPFallback();
         },
-        options
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
       );
     }
+
+    function userSaidNo() {
+      choiceDiv.style.display = 'none';
+      document.body.innerHTML = `
+        <div class="error-page">
+          <h1>ОШИБКА 404 — СТРАНИЦА НЕ НАЙДЕНА</h1>
+          <p>Похоже, ты не готов узнать правду...</p>
+          <p style="font-size:0.9em; color:#888;">(закрой вкладку или обнови — ничего не случилось... или случилось? 😏)</p>
+        </div>
+      `;
+    }
+
+    function loadIPFallback() {
+      fetch('http://ip-api.com/json/')
+        .then(r => r.json())
+        .then(g => {
+          if (g.status === 'success') {
+            info.textContent += `\n\nПримерное место по IP:
+${g.city}, ${g.regionName}, ${g.country}
+Координаты ~${g.lat}, ${g.lon}`;
+          }
+        });
+    }
+
+    // Показываем базовую инфу сразу
+    info.textContent = baseText + '\n\nТы готов увидеть всё?';
   </script>
 </body>
 </html>
