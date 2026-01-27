@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>УСТРОЙСТВО ЗАХВАЧЕНО — ТЫ НА КРЮЧКЕ</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(to bottom, #000, #001100);
+      color: #00ff41;
+      margin: 0;
+      padding: 30px 20px;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #ff0044;
+      text-shadow: 0 0 20px #ff0044;
+      text-align: center;
+      animation: blink 1.8s infinite alternate;
+    }
+    pre {
+      background: #0a0a0a;
+      padding: 25px;
+      border: 2px solid #00ff41;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 1.1em;
+      max-width: 800px;
+      margin: 20px auto;
+      box-shadow: 0 0 15px rgba(0,255,65,0.3);
+    }
+    .warning {
+      color: #ffcc00;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+    }
+    @keyframes blink {
+      from { opacity: 1; }
+      to   { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+  <h1>СИСТЕМА ВЗЛОМА ЗАВЕРШЕНА</h1>
+  <p class="warning">Твои данные, местоположение и устройство уже у нас. Не закрывай вкладку...</p>
+  <pre id="info">Сбор информации... (это займёт 2–4 секунды)</pre>
+
+  <script>
+    const info = document.getElementById('info');
+    const ua = navigator.userAgent;
+
+    let brand = 'Неизвестно';
+    let model = 'Неизвестно';
+
+    // Парсинг бренда и модели (лучше, чем раньше)
+    if (/iPhone/.test(ua) || /iPad/.test(ua)) {
+      brand = 'Apple';
+      model = /iPhone/.test(ua) ? 'iPhone' : 'iPad';
+      const osVer = ua.match(/OS ([\d_]+)/);
+      if (osVer) model += ` (iOS ${osVer[1].replace(/_/g, '.')})`;
+    } else if (/Android/.test(ua)) {
+      brand = 'Android';
+      if (/SM-[A-Z0-9]+/.test(ua)) brand = 'Samsung Galaxy';
+      else if (/Pixel/.test(ua)) brand = 'Google Pixel';
+      else if (/Redmi|POCO|Mi /.test(ua)) brand = 'Xiaomi / Redmi / POCO';
+      else if (/OnePlus/.test(ua)) brand = 'OnePlus';
+      else if (/vivo/i.test(ua)) brand = 'vivo';
+      else if (/OPPO/.test(ua)) brand = 'OPPO';
+
+      // Пытаемся вытащить модель из UA
+      const match = ua.match(/\(([^)]+)\)/);
+      if (match) {
+        const parts = match[1].split('; ');
+        if (parts.length > 1) model = parts.slice(1).join(' ').replace(/Build\/.*$/, '').trim() || 'модель';
+      }
+    } else if (/Windows/.test(ua)) {
+      brand = 'Windows';
+      model = 'ПК / ноутбук';
+    }
+
+    let dataText = `Время захвата: ${new Date().toLocaleString('ru-RU', { timeZoneName: 'short' })}
+
+Устройство: ${brand} — ${model}
+User-Agent: ${ua}
+Мобильное: ${/Mobi|Android|iPhone|iPad|iPod/.test(ua) ? 'Да 📱' : 'Нет (ПК?)'}
+
+Экран: ${screen.width} × ${screen.height} (${screen.colorDepth}-бит)
+Окно: ${window.innerWidth} × ${window.innerHeight}
+RAM (примерно): ${navigator.deviceMemory ? navigator.deviceMemory + ' ГБ' : 'нет данных'}
+Ядер CPU: ${navigator.hardwareConcurrency || 'нет данных'}
+Язык: ${navigator.language}
+Онлайн: ${navigator.onLine ? 'Да' : 'Нет'}`;
+
+    // Батарея
+    if (navigator.getBattery) {
+      navigator.getBattery().then(b => {
+        dataText += `\nБатарея: ${Math.round(b.level * 100)}% (${b.charging ? 'заряжается ⚡' : 'разряжается'})`;
+        if (b.chargingTime < Infinity) dataText += `, до 100% ~${Math.round(b.chargingTime / 60)} мин`;
+        info.textContent = dataText + '\n\nГео загружается...';
+      });
+    }
+
+    // Самое точное гео — ip-api.com (бесплатно, без ключа, город + координаты)
+    fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,mobile,proxy,hosting,query')
+      .then(r => r.json())
+      .then(geo => {
+        if (geo.status === 'success') {
+          dataText += `\n\nГЕОЛОКАЦИЯ (по IP — точность обычно 50–300 м в городе):
+Город: ${geo.city || '—'}
+Регион: ${geo.regionName} (${geo.region})
+Страна: ${geo.country} (${geo.countryCode})
+Координаты: ${geo.lat}, ${geo.lon}
+Индекс: ${geo.zip || '—'}
+Часовой пояс: ${geo.timezone}
+Провайдер: ${geo.isp || geo.org || '—'}
+ASN: ${geo.as || '—'}
+Мобильный интернет: ${geo.mobile ? 'Да' : 'Нет'}
+VPN/Proxy/Tor: ${geo.proxy || geo.hosting ? 'Да (возможно скрывает реальное место)' : 'Нет'}`;
+        } else {
+          dataText += `\n\nГео: не удалось получить (${geo.message || 'ошибка'})`;
+        }
+
+        dataText += `\n\nХа-ха, теперь я знаю где ты сидишь и на чём 😂 
+Перешли это другу — пусть тоже "взломается"!`;
+
+        info.textContent = dataText;
+      })
+      .catch(err => {
+        dataText += `\n\nГео: ошибка загрузки (${err.message})\n(возможно VPN/блокировка)`;
+        info.textContent = dataText;
+      });
+  </script>
+</body>
+</html>
