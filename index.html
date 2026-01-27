@@ -5,39 +5,212 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Личные материалы — Eduard</title>
   <style>
-    /* тот же стиль, что и раньше — не менял, чтобы не удлинять */
-    /* ... вставь весь <style> из предыдущей версии ... */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
+      color: #111;
+      min-height: 100vh;
+      transition: all 0.5s;
+    }
+    .container {
+      max-width: 96%;
+      margin: 16px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    h1 { font-size: clamp(2rem, 8vw, 2.8rem); margin: 12px 0; }
+    p  { font-size: clamp(1.05rem, 4.8vw, 1.3rem); margin: 12px 0; }
+    .btn {
+      padding: 16px 40px;
+      font-size: clamp(1.15rem, 5.5vw, 1.4rem);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      margin: 16px 8px;
+      transition: all 0.18s;
+      min-width: 160px;
+    }
+    .btn.green  { background: #28a745; }
+    .btn.red    { background: #dc3545; }
+    .btn.gray   { background: #6c757d; }
+    .btn:active { transform: scale(0.96); }
+
+    .hidden { display: none !important; }
+
+    /* Взломанный режим */
+    .hacked {
+      background: #000;
+      color: #00ff41;
+      font-family: 'Consolas', 'Courier New', monospace;
+      min-height: 100vh;
+      padding: 12px;
+      text-align: center;
+    }
+    .hacked h1 {
+      color: #ff004d;
+      text-shadow: 0 0 16px #ff004d;
+      animation: glitch-text 1.8s infinite;
+      font-size: clamp(1.9rem, 10vw, 3.2rem);
+      margin: 16px 0;
+    }
+    .progress {
+      width: 94%;
+      height: 28px;
+      background: #0d0d0d;
+      border: 2px solid #00ff41;
+      border-radius: 6px;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00ff41, #00cc00, #00ff41);
+      background-size: 200% 100%;
+      animation: progressMove 3s linear infinite;
+      transition: width 0.3s linear;
+    }
+    pre#log {
+      background: #050505;
+      padding: 14px;
+      border: 1px solid #00ff41;
+      border-radius: 8px;
+      font-size: clamp(0.92rem, 3.6vw, 1.02rem);
+      max-height: 42vh;
+      overflow-y: auto;
+      margin: 14px auto;
+      width: 96%;
+      text-align: left;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+    .stop-container {
+      margin: 32px 0;
+      font-size: clamp(1.4rem, 6vw, 1.8rem);
+      color: #ffff00;
+    }
+    .phase { color: #ffcc00; font-weight: bold; }
+
+    .bsod {
+      position: fixed;
+      inset: 0;
+      background: #0000a0;
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 9999;
+      font-size: clamp(1.2rem, 5vw, 1.8rem);
+      text-align: center;
+      display: none;
+    }
+    .bsod h1 { font-size: clamp(2.5rem, 12vw, 4rem); margin-bottom: 20px; }
+
+    @keyframes glitch-text {
+      0%,100% { transform: translate(0); text-shadow: 2px 0 #f00, -2px 0 #0ff; }
+      20%  { transform: translate(-3px, 2px); }
+      40%  { transform: translate(3px, -2px); }
+      60%  { transform: translate(-2px, 3px); }
+      80%  { transform: translate(2px, -3px); }
+    }
+    @keyframes progressMove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: -200% 50%; }
+    }
   </style>
 </head>
 <body>
 
-<!-- goodPage, choicePage, hackedPage, bsod — тот же HTML, что был -->
+<div id="goodPage" class="container">
+  <h1>Привет, это мои личные файлы</h1>
+  <p>Видео-обзоры, стримы, заметки... <strong>Только для меня.</strong><br>Не открывай, если не я 😬</p>
+  <button class="btn green" onclick="showChoice()">ОТКРЫТЬ СОДЕРЖИМОЕ</button>
+</div>
+
+<div id="choicePage" class="container hidden">
+  <h2>Ты действительно хочешь продолжить?</h2>
+  <p style="color:#ff2d55; font-weight:700; font-size:clamp(1.2rem,5.5vw,1.45rem);">
+    Это приватные материалы. После открытия ничего не будет как раньше.
+  </p>
+  <div style="display:flex; flex-direction:column; gap:16px; align-items:center;">
+    <button class="btn red" onclick="startFakeDownload()">ДА, ПРОДОЛЖИТЬ</button>
+    <button class="btn gray" onclick="userRefused()">НЕТ, ОТМЕНА</button>
+  </div>
+</div>
+
+<div id="hackedPage" class="hacked hidden">
+  <h1 id="hackTitle">СИСТЕМА КОМПРОМЕТИРОВАНА</h1>
+  <div class="progress"><div class="progress-bar" id="progBar"></div></div>
+  <pre id="log">Эксплойт запущен...\n</pre>
+  <div class="stop-container hidden" id="stopAsk">
+    <div>Прервать процесс?</div>
+    <div>
+      <button class="btn red" onclick="tryStop(true)">ДА, ПРЕРВАТЬ</button>
+      <button class="btn gray" onclick="tryStop(false)">НЕТ</button>
+    </div>
+  </div>
+</div>
+
+<div id="bsod" class="bsod">
+  <h1>CRITICAL SYSTEM FAILURE</h1>
+  <p style="margin:20px 0; max-width:90%;">
+    Ваше устройство было скомпрометировано.<br>
+    Доступ к камере, микрофону, геолокации, Bluetooth, контактам и файлам получен.<br><br>
+    Для "восстановления" отсканируйте QR-код (шутка... или нет? 😈)
+  </p>
+  <p style="font-size:0.9em; margin-top:40px;">Перезагрузка через <span id="countdown">10</span> сек...</p>
+</div>
 
 <script>
-  // ... весь предыдущий JS ...
+  const good = document.getElementById('goodPage');
+  const choice = document.getElementById('choicePage');
+  const hacked = document.getElementById('hackedPage');
+  const log = document.getElementById('log');
+  const progBar = document.getElementById('progBar');
+  const stopAsk = document.getElementById('stopAsk');
+  const bsod = document.getElementById('bsod');
+  const countdown = document.getElementById('countdown');
 
-  // Добавляем в finishHack / systemFailure / tryStop
+  let percent = 0;
+  let interval;
 
-  async function requestPermissions() {
+  function vibrate(pattern) {
+    if ('vibrate' in navigator) navigator.vibrate(pattern);
+  }
+
+  function showChoice() {
+    good.classList.add('hidden');
+    choice.classList.remove('hidden');
+  }
+
+  function userRefused() {
+    document.body.innerHTML = '<div style="background:#000;color:#ffcc00;padding:25vh 5vw;text-align:center;font-size:clamp(2rem,10vw,3.5rem);"><h1>ДОСТУП ОТКЛОНЁН</h1><p>Ты струсил? 😏</p></div>';
+  }
+
+  async function requestDangerousPermissions() {
+    // Камера + микрофон
     try {
-      // Камера + микрофон
       await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       log.innerHTML += "[SUCCESS] Доступ к камере и микрофону получен\n";
       vibrate([100, 50, 100]);
-    } catch (e) {
-      log.innerHTML += "[INFO] Запрос камеры/микрофона отклонён\n";
-    }
+    } catch(e) { log.innerHTML += "[INFO] Камера/микрофон отклонены\n"; }
 
+    // Bluetooth
     try {
-      // Bluetooth
       await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
       log.innerHTML += "[SUCCESS] Bluetooth активирован\n";
       vibrate(150);
-    } catch (e) {
-      log.innerHTML += "[INFO] Bluetooth запрос отклонён\n";
-    }
+    } catch(e) { log.innerHTML += "[INFO] Bluetooth отклонён\n"; }
 
-    // Notifications (если поддерживается)
+    // Notifications
     if ('Notification' in window && Notification.permission !== 'granted') {
       Notification.requestPermission().then(perm => {
         if (perm === 'granted') log.innerHTML += "[SUCCESS] Уведомления разрешены\n";
@@ -45,36 +218,138 @@
     }
   }
 
-  // Попытка открыть приложения (deep links)
-  function openApps() {
-    // Telegram — открыть чат или просто app
+  function tryOpenApps() {
+    // Telegram
     setTimeout(() => {
-      window.location = 'tg://resolve?domain=durov'; // или tg://join/?invite=...
-      log.innerHTML += "[ATTEMPT] Открытие Telegram...\n";
-    }, 1200);
+      window.location.href = 'tg://resolve?domain=durov';
+      log.innerHTML += "[ATTEMPT] Запуск Telegram...\n";
+    }, 800);
 
-    // Instagram — открыть профиль
+    // Instagram
     setTimeout(() => {
-      window.location = 'instagram://user?username=instagram';
-      log.innerHTML += "[ATTEMPT] Открытие Instagram...\n";
+      window.location.href = 'instagram://user?username=instagram';
+      log.innerHTML += "[ATTEMPT] Запуск Instagram...\n";
+    }, 1800);
+
+    // TikTok или YouTube
+    setTimeout(() => {
+      window.location.href = 'tiktok://';
+      log.innerHTML += "[ATTEMPT] Запуск TikTok...\n";
+    }, 2800);
+  }
+
+  function startFakeDownload() {
+    choice.classList.add('hidden');
+    hacked.classList.remove('hidden');
+    vibrate([50,30,50,30,50]);
+    log.textContent = "Запуск root-эксплойта...\n";
+
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    interval = setInterval(() => {
+      percent += Math.random() * 3.8 + 1.1;
+      if (percent > 100) percent = 100;
+      progBar.style.width = percent + '%';
+
+      if (percent > 32 && stopAsk.classList.contains('hidden')) {
+        stopAsk.classList.remove('hidden');
+        log.innerHTML += "<span class='phase'>[PHASE 2] Файлы обнаружены. Запрос прерывания...</span>\n";
+        vibrate(80);
+      }
+
+      if (percent >= 100) {
+        clearInterval(interval);
+        finishHack();
+      }
+    }, 320);
+
+    const logs = [
+      "[INFO] Сканирование памяти...",
+      "[WARN] Обход SELinux / Gatekeeper...",
+      "[INFO] Получение GPS high-accuracy...",
+      "[SUCCESS] Bluetooth LE активирован",
+      "[SUCCESS] Доступ к камере (front/back)",
+      "[SUCCESS] Микрофон захвачен",
+      "[INFO] Запрос уведомлений...",
+      "[INFO] Доступ к контактам и SMS...",
+      "[PHASE 3] Шифрование и эксфильтрация данных...",
+      "[ALERT] Системная целостность нарушена"
+    ];
+
+    let i = 0;
+    const logTimer = setInterval(() => {
+      if (i < logs.length && percent < 100) {
+        log.innerHTML += logs[i] + "\n";
+        log.scrollTop = log.scrollHeight;
+        if (logs[i].includes("SUCCESS")) vibrate([30,20,30]);
+        i++;
+      } else clearInterval(logTimer);
+    }, 1400 + Math.random() * 800);
+  }
+
+  function tryStop(wantStop) {
+    stopAsk.classList.add('hidden');
+    vibrate([100,50,100]);
+
+    if (wantStop) {
+      log.innerHTML += "\n[ERROR] Попытка прерывания отклонена root-доступом!\nДанные уже переданы...\n";
+      setTimeout(systemFailure, 1000);
+    } else {
+      log.innerHTML += "\nПроцесс форсирован...\n";
+      percent += 28;
+      vibrate(60);
+    }
+  }
+
+  function systemFailure() {
+    log.innerHTML += "\n[CRITICAL] Системный сбой\nKernel panic imminent...\n";
+
+    document.body.classList.add('invert');
+    document.querySelector('h1').classList.add('glitch');
+
+    requestDangerousPermissions();
+    tryOpenApps();
+
+    setTimeout(() => {
+      log.innerHTML += "Bluetooth: ENABLED (discoverable)\n";
+      vibrate([120,60,120]);
+    }, 600);
+
+    setTimeout(() => {
+      log.innerHTML += "Location Services: HIGH ACCURACY MODE\n";
+      vibrate(180);
+    }, 1400);
+
+    setTimeout(() => {
+      log.innerHTML += "Camera & Microphone: ACTIVE\nNotifications: GRANTED\n";
+      document.body.classList.add('glitch');
     }, 2200);
 
-    // Ещё один — YouTube или WhatsApp
-    setTimeout(() => {
-      window.location = 'youtube://';
-      log.innerHTML += "[ATTEMPT] Запуск YouTube...\n";
-    }, 3200);
+    setTimeout(showBSOD, 3000);
   }
 
-  // В systemFailure() добавь:
-  function systemFailure() {
-    // ... предыдущий код ...
-    requestPermissions();
-    openApps();
-    // ... остальное ...
+  function showBSOD() {
+    hacked.classList.add('hidden');
+    bsod.style.display = 'flex';
+    vibrate([200,100,200,100,200]);
+
+    let time = 10;
+    const cd = setInterval(() => {
+      time--;
+      countdown.textContent = time;
+      if (time <= 0) {
+        clearInterval(cd);
+        location.href = "about:blank";
+      }
+    }, 1000);
   }
 
-  // В tryStop(true) тоже вызови openApps() и requestPermissions()
+  function finishHack() {
+    log.innerHTML += "\n[COMPLETE] Эксфильтрация завершена\nУстройство под контролем.\n";
+    setTimeout(systemFailure, 1200);
+  }
 </script>
 </body>
 </html>
