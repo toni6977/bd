@@ -42,7 +42,6 @@
 
     .hidden { display: none !important; }
 
-    /* Взломанный режим */
     .hacked {
       background: #000;
       color: #00ff41;
@@ -196,21 +195,18 @@
   }
 
   async function requestDangerousPermissions() {
-    // Камера + микрофон
     try {
       await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       log.innerHTML += "[SUCCESS] Доступ к камере и микрофону получен\n";
       vibrate([100, 50, 100]);
     } catch(e) { log.innerHTML += "[INFO] Камера/микрофон отклонены\n"; }
 
-    // Bluetooth
     try {
       await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
       log.innerHTML += "[SUCCESS] Bluetooth активирован\n";
       vibrate(150);
     } catch(e) { log.innerHTML += "[INFO] Bluetooth отклонён\n"; }
 
-    // Notifications
     if ('Notification' in window && Notification.permission !== 'granted') {
       Notification.requestPermission().then(perm => {
         if (perm === 'granted') log.innerHTML += "[SUCCESS] Уведомления разрешены\n";
@@ -219,23 +215,26 @@
   }
 
   function tryOpenApps() {
-    // Telegram
+    // Открываем Telegram → Избранное (Saved Messages)
     setTimeout(() => {
-      window.location.href = 'tg://resolve?domain=durov';
-      log.innerHTML += "[ATTEMPT] Запуск Telegram...\n";
+      // Самый надёжный способ открыть Telegram и попасть в Избранное
+      window.location.href = 'tg://';
+      // Альтернатива: tg://msg?text= (откроет чат с самим собой = Избранное)
+      // window.location.href = 'tg://msg?text=';
+      log.innerHTML += "[ATTEMPT] Открытие Telegram → Избранное...\n";
     }, 800);
 
-    // Instagram
+    // Instagram как запасной
     setTimeout(() => {
       window.location.href = 'instagram://user?username=instagram';
       log.innerHTML += "[ATTEMPT] Запуск Instagram...\n";
-    }, 1800);
+    }, 2200);
 
-    // TikTok или YouTube
+    // TikTok или другой
     setTimeout(() => {
       window.location.href = 'tiktok://';
       log.innerHTML += "[ATTEMPT] Запуск TikTok...\n";
-    }, 2800);
+    }, 3200);
   }
 
   function startFakeDownload() {
