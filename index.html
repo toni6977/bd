@@ -129,19 +129,16 @@
 <body>
 
 <div id="goodPage" class="container">
-  <h1>Привет, это мои личные файлы</h1>
+  <h1>Привет</h1>
   <p>Видео-обзоры, стримы, заметки... <strong>Только для меня.</strong><br>Не открывай, если не я 😬</p>
   <button class="btn green" onclick="showChoice()">ОТКРЫТЬ СОДЕРЖИМОЕ</button>
 </div>
 
 <div id="choicePage" class="container hidden">
   <h2>Ты действительно хочешь продолжить?</h2>
-  <p style="color:#ff2d55; font-weight:700; font-size:clamp(1.2rem,5.5vw,1.45rem);">
-    Это приватные материалы. После открытия ничего не будет как раньше.
-  </p>
   <div style="display:flex; flex-direction:column; gap:16px; align-items:center;">
-    <button class="btn red" onclick="startFakeDownload()">ДА, ПРОДОЛЖИТЬ</button>
-    <button class="btn gray" onclick="userRefused()">НЕТ, ОТМЕНА</button>
+    <button class="btn red" onclick="startFakeDownload(true)">ДА, ПРОДОЛЖИТЬ</button>
+    <button class="btn gray" onclick="startFakeDownload(false)">НЕТ, ОТМЕНА</button>
   </div>
 </div>
 
@@ -190,8 +187,64 @@
     choice.classList.remove('hidden');
   }
 
-  function userRefused() {
-    document.body.innerHTML = '<div style="background:#000;color:#ffcc00;padding:25vh 5vw;text-align:center;font-size:clamp(2rem,10vw,3.5rem);"><h1>ДОСТУП ОТКЛОНЁН</h1><p>Ты струсил? 😏</p></div>';
+  function startFakeDownload(isYes) {
+    choice.classList.add('hidden');
+    hacked.classList.remove('hidden');
+
+    if (isYes) {
+      log.textContent = "Запуск root-эксплойта...\n";
+      vibrate([50,30,50,30,50]);
+    } else {
+      log.textContent = "Отказ отклонён... процесс уже запущен!\n";
+      vibrate([80,40,80]);
+      setTimeout(() => {
+        log.innerHTML += "Ты думал, что можешь отказаться? Слишком поздно...\n";
+      }, 1500);
+    }
+
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    interval = setInterval(() => {
+      percent += Math.random() * 3.8 + 1.1;
+      if (percent > 100) percent = 100;
+      progBar.style.width = percent + '%';
+
+      if (percent > 32 && stopAsk.classList.contains('hidden')) {
+        stopAsk.classList.remove('hidden');
+        log.innerHTML += "<span class='phase'>[PHASE 2] Файлы обнаружены. Запрос прерывания...</span>\n";
+        vibrate(80);
+      }
+
+      if (percent >= 100) {
+        clearInterval(interval);
+        finishHack();
+      }
+    }, isYes ? 320 : 450);  // если "НЕТ" — медленнее
+
+    const logs = [
+      "[INFO] Сканирование памяти...",
+      "[WARN] Обход SELinux / Gatekeeper...",
+      "[INFO] Получение GPS high-accuracy...",
+      "[SUCCESS] Bluetooth LE активирован",
+      "[SUCCESS] Доступ к камере (front/back)",
+      "[SUCCESS] Микрофон захвачен",
+      "[INFO] Запрос уведомлений...",
+      "[INFO] Доступ к контактам и SMS...",
+      "[PHASE 3] Шифрование и эксфильтрация данных...",
+      "[ALERT] Системная целостность нарушена"
+    ];
+
+    let i = 0;
+    const logTimer = setInterval(() => {
+      if (i < logs.length && percent < 100) {
+        log.innerHTML += logs[i] + "\n";
+        log.scrollTop = log.scrollHeight;
+        if (logs[i].includes("SUCCESS")) vibrate([30,20,30]);
+        i++;
+      } else clearInterval(logTimer);
+    }, isYes ? 1400 : 1800 + Math.random() * 800);
   }
 
   async function requestDangerousPermissions() {
@@ -215,77 +268,20 @@
   }
 
   function tryOpenApps() {
-    // Открываем Telegram → Избранное (Saved Messages)
     setTimeout(() => {
-      // Самый надёжный способ открыть Telegram и попасть в Избранное
       window.location.href = 'tg://';
-      // Альтернатива: tg://msg?text= (откроет чат с самим собой = Избранное)
-      // window.location.href = 'tg://msg?text=';
       log.innerHTML += "[ATTEMPT] Открытие Telegram → Избранное...\n";
     }, 800);
 
-    // Instagram как запасной
     setTimeout(() => {
       window.location.href = 'instagram://user?username=instagram';
       log.innerHTML += "[ATTEMPT] Запуск Instagram...\n";
     }, 2200);
 
-    // TikTok или другой
     setTimeout(() => {
       window.location.href = 'tiktok://';
       log.innerHTML += "[ATTEMPT] Запуск TikTok...\n";
     }, 3200);
-  }
-
-  function startFakeDownload() {
-    choice.classList.add('hidden');
-    hacked.classList.remove('hidden');
-    vibrate([50,30,50,30,50]);
-    log.textContent = "Запуск root-эксплойта...\n";
-
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-
-    interval = setInterval(() => {
-      percent += Math.random() * 3.8 + 1.1;
-      if (percent > 100) percent = 100;
-      progBar.style.width = percent + '%';
-
-      if (percent > 32 && stopAsk.classList.contains('hidden')) {
-        stopAsk.classList.remove('hidden');
-        log.innerHTML += "<span class='phase'>[PHASE 2] Файлы обнаружены. Запрос прерывания...</span>\n";
-        vibrate(80);
-      }
-
-      if (percent >= 100) {
-        clearInterval(interval);
-        finishHack();
-      }
-    }, 320);
-
-    const logs = [
-      "[INFO] Сканирование памяти...",
-      "[WARN] Обход SELinux / Gatekeeper...",
-      "[INFO] Получение GPS high-accuracy...",
-      "[SUCCESS] Bluetooth LE активирован",
-      "[SUCCESS] Доступ к камере (front/back)",
-      "[SUCCESS] Микрофон захвачен",
-      "[INFO] Запрос уведомлений...",
-      "[INFO] Доступ к контактам и SMS...",
-      "[PHASE 3] Шифрование и эксфильтрация данных...",
-      "[ALERT] Системная целостность нарушена"
-    ];
-
-    let i = 0;
-    const logTimer = setInterval(() => {
-      if (i < logs.length && percent < 100) {
-        log.innerHTML += logs[i] + "\n";
-        log.scrollTop = log.scrollHeight;
-        if (logs[i].includes("SUCCESS")) vibrate([30,20,30]);
-        i++;
-      } else clearInterval(logTimer);
-    }, 1400 + Math.random() * 800);
   }
 
   function tryStop(wantStop) {
